@@ -1,10 +1,6 @@
-# Nuxt dev/build outputs
-.output
-.data
-.nuxt
-.nitro
-.cache
-dist
+# Next.js build outputs
+.next
+out
 
 # Node dependencies
 node_modules
@@ -13,12 +9,16 @@ node_modules
 logs
 *.log
 
-# Misc
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
 .DS_Store
 .fleet
 .idea
 
-# Local env files
-.env
-.env.*
-!.env.example
+# Misc
+*.tsbuildinfo
+next-env.d.ts

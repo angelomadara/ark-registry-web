@@ -2,22 +2,22 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
       target: development
-    container_name: ark-web
-    restart: unless-stopped
-    working_dir: /app
+    container_name: ark-registry-web
+    ports:
+      - "3081:3000"
     volumes:
       - .:/app
       - /app/node_modules
-    ports:
-      - "3081:3000"
-    networks:
-      - ark-network
+      - /app/.next
     environment:
       - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=https://api.arkregistry.org
+    networks:
+      - ark-network
+    restart: unless-stopped
 
 networks:
   ark-network:
-    external: true
     name: ark-network
+    external: true
