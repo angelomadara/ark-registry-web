@@ -11,7 +11,8 @@ export function useApi<T = unknown>(
   url: string,
   options: UseFetchOptions<T> = {}
 ) {
-  const config = useRuntimeConfig()
+  const nuxtApp = useNuxtApp()
+  const config = nuxtApp.$config
   const authStore = useAuthStore()
 
   const headers: HeadersInit = {
@@ -42,7 +43,8 @@ export function useApiFetch<T = unknown>(
   url: string,
   options: UseFetchOptions<ApiResponse<T>> = {}
 ) {
-  const config = useRuntimeConfig()
+  const nuxtApp = useNuxtApp()
+  const config = nuxtApp.$config
   const authStore = useAuthStore()
 
   const headers: HeadersInit = {
@@ -80,7 +82,8 @@ export async function apiFetch<T = unknown>(
   url: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const config = useRuntimeConfig()
+  const nuxtApp = useNuxtApp()
+  const config = nuxtApp.$config
   const authStore = useAuthStore()
 
   const headers: Record<string, string> = {
