@@ -24,4 +24,10 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
+
+  vite: {
+    server: {
+      allowedHosts: ['web.arkregistry.org', '.arkregistry.org'],
+    },
+  },
 })
