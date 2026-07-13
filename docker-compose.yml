@@ -16,7 +16,6 @@ services:
       - ark-network
     environment:
       - NODE_ENV=development
-      - NUXT_PUBLIC_API_BASE=http://ark-backend:3000
 
 networks:
   ark-network:
