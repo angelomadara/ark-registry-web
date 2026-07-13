@@ -1,0 +1,24 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: ark-web
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3081:3000"
+    networks:
+      - ark-network
+    environment:
+      - NODE_ENV=development
+      - NUXT_PUBLIC_API_BASE=http://ark-backend:3000
+
+networks:
+  ark-network:
+    external: true
+    name: ark-network

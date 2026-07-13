@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-forest: #1a4a2e;
+  --color-forest-light: #2d6a4f;
+  --color-leaf: #40916c;
+  --color-leaf-light: #52b788;
+  --color-earth: #8b6f47;
+  --color-sky: #d8f3dc;
+  --color-cream: #f8f5ed;
+}
+
+body {
+  @apply bg-[var(--color-cream)] text-gray-800 font-sans;
+}
