@@ -1,5 +1,5 @@
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<{ id: number; name: string; email: string } | null>(null)
+  const user = ref<{ id: number; username: string; role: string } | null>(null)
   const token = ref<string | null>(null)
 
   // Hydrate from localStorage on init
@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value)
 
-  function setUser(userData: { id: number; name: string; email: string }, authToken: string) {
+  function setUser(userData: { id: number; username: string; role: string }, authToken: string) {
     user.value = userData
     token.value = authToken
     if (import.meta.client) {

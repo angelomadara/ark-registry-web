@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'auth',
+  // Species detail is PUBLIC — no auth required
 })
 
 const route = useRoute()

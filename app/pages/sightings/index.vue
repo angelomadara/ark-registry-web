@@ -80,7 +80,7 @@ const sightings = ref<Sighting[]>([])
 
 onMounted(async () => {
   try {
-    sightings.value = await apiFetch<Sighting[]>('/api/species-sightings')
+    sightings.value = await apiFetch<Sighting[]>('/api/v1/species/sightings')
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : 'Failed to load sightings'
   } finally {

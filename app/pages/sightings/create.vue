@@ -29,40 +29,28 @@
 
       <!-- Description -->
       <div>
-        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
         <textarea
-          id="description"
-          v-model="form.description"
+          id="notes"
+          v-model="form.notes"
           rows="4"
           placeholder="Describe what you observed — habitat, behavior, number of individuals, etc."
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-leaf)] focus:border-transparent"
         ></textarea>
       </div>
 
-      <!-- Location -->
-      <div>
-        <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-        <input
-          id="location"
-          v-model="form.location"
-          type="text"
-          placeholder="e.g. Amazon Rainforest, Brazil"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-leaf)] focus:border-transparent"
-        />
-      </div>
-
       <!-- Photo Upload -->
       <div>
-        <label for="image" class="block text-sm font-medium text-gray-700 mb-1">Photo URL</label>
+        <label for="image" class="block text-sm font-medium text-gray-700 mb-1">Photo</label>
         <input
           id="image"
-          v-model="form.image_url"
-          type="url"
-          placeholder="https://example.com/photo.jpg"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-leaf)] focus:border-transparent"
+          ref="imageInput"
+          type="file"
+          accept="image/*"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-leaf)] focus:border-transparent file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-[var(--color-leaf)] file:text-white file:cursor-pointer file:hover:bg-[var(--color-leaf-light)]"
         />
         <p class="text-xs text-gray-400 mt-1">
-          Provide a URL to an image of your sighting
+          Upload a photo of your sighting (optional)
         </p>
       </div>
 
@@ -86,13 +74,13 @@ definePageMeta({
 })
 
 const speciesStore = useSpeciesStore()
+const authStore = useAuthStore()
 const router = useRouter()
+const imageInput = ref<HTMLInputElement | null>(null)
 
 const form = reactive({
   species_id: '',
-  description: '',
-  location: '',
-  image_url: '',
+  notes: '',
 })
 
 const error = ref('')
@@ -109,25 +97,41 @@ async function handleSubmit() {
   submitting.value = true
 
   try {
-    await apiFetch('/api/species-sightings', {
+    const config = useRuntimeConfig()
+    const formData = new FormData()
+
+    formData.append('user_id', String(authStore.user?.id ?? ''))
+    formData.append('species_id', form.species_id)
+    if (form.notes) {
+      formData.append('notes', form.notes)
+    }
+
+    if (imageInput.value?.files?.[0]) {
+      formData.append('image', imageInput.value.files[0])
+    }
+
+    // Use native fetch with FormData — NO Content-Type header (browser sets boundary)
+    const response = await fetch(`${config.public.apiBase}/api/v1/species/register`, {
       method: 'POST',
-      body: JSON.stringify({
-        species_id: Number(form.species_id),
-        description: form.description || undefined,
-        location: form.location || undefined,
-        image_url: form.image_url || undefined,
-      }),
+      headers: authStore.token
+        ? { Authorization: `Bearer ${authStore.token}` }
+        : {},
+      body: formData,
     })
 
-    success.value = true
-    // Reset form
-    form.species_id = ''
-    form.description = ''
-    form.location = ''
-    form.image_url = ''
+    const body = await response.json()
 
-    // Redirect after a moment
-    setTimeout(() => router.push('/sightings'), 1500)
+    if (body && body.success === true) {
+      success.value = true
+      form.species_id = ''
+      form.notes = ''
+      if (imageInput.value) {
+        imageInput.value.value = ''
+      }
+      setTimeout(() => router.push('/sightings'), 1500)
+    } else {
+      throw new Error(body.message || 'Failed to submit sighting')
+    }
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : 'Failed to submit sighting'
   } finally {

@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'auth',
+  // Species list is PUBLIC — no auth required
 })
 
 const speciesStore = useSpeciesStore()

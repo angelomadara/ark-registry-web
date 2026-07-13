@@ -11,11 +11,11 @@ export interface Species {
 
 export function useSpecies() {
   async function getAll(): Promise<Species[]> {
-    return apiFetch<Species[]>('/api/species')
+    return apiFetch<Species[]>('/api/v1/species')
   }
 
   async function getById(id: number | string): Promise<Species> {
-    return apiFetch<Species>(`/api/species/${id}`)
+    return apiFetch<Species>(`/api/v1/species/${id}`)
   }
 
   return {

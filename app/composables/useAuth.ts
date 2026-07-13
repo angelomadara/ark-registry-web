@@ -2,12 +2,12 @@ export function useAuth() {
   const authStore = useAuthStore()
   const router = useRouter()
 
-  async function login(email: string, password: string) {
-    const data = await apiFetch<{ token: string; user: { id: number; name: string; email: string } }>(
-      '/api/auth/login',
+  async function login(username: string, password: string) {
+    const data = await apiFetch<{ token: string; user: { id: number; username: string; role: string } }>(
+      '/api/v1/auth/login',
       {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       }
     )
 
@@ -15,12 +15,12 @@ export function useAuth() {
     return data
   }
 
-  async function register(name: string, email: string, password: string) {
-    const data = await apiFetch<{ token: string; user: { id: number; name: string; email: string } }>(
-      '/api/auth/register',
+  async function register(username: string, email: string, password: string) {
+    const data = await apiFetch<{ token: string; user: { id: number; username: string; role: string } }>(
+      '/api/v1/auth/register',
       {
         method: 'POST',
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ username, email, password }),
       }
     )
 
