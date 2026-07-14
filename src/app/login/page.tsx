@@ -3,23 +3,34 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth } from "@/app/context/AuthContext";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
   const router = useRouter();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
+    // alert('asdflkjsdf');
+    // return;
 
     try {
-      await login(username, password);
+      const result = await signIn("credentials", {
+        username,
+        password,
+        redirect: false,
+      });
+      console.log(result)
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
       router.push("/");
     } catch (err) {
       setError(

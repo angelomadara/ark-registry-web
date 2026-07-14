@@ -3,12 +3,11 @@
 import {
   createContext,
   useContext,
-  useState,
-  useEffect,
   useCallback,
+  useEffect,
   type ReactNode,
 } from "react";
-import { login as apiLogin, logout as apiLogout } from "@/lib/auth";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 interface User {
   id: number;
@@ -28,32 +27,48 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setTokenState] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session, status, update } = useSession();
 
+  const user: User | null =
+    session?.user && session.user.username
+      ? {
+          id: Number(session.user.id),
+          username: session.user.username,
+          role: session.user.role,
+        }
+      : null;
+
+  const token: string | null = session?.backendToken ?? null;
+
+  // Sync the backend token to localStorage so lib/api.ts can find it
   useEffect(() => {
-    const storedToken = localStorage.getItem("ark_token");
-    const storedUser = localStorage.getItem("ark_user");
-    if (storedToken && storedUser) {
-      setTokenState(storedToken);
-      setUser(JSON.parse(storedUser));
+    if (token) {
+      localStorage.setItem("ark_token", token);
+      if (user) {
+        localStorage.setItem("ark_user", JSON.stringify(user));
+      }
+    } else if (status === "unauthenticated") {
+      localStorage.removeItem("ark_token");
+      localStorage.removeItem("ark_user");
     }
-    setIsLoading(false);
-  }, []);
+  }, [token, user, status]);
 
   const login = useCallback(async (username: string, password: string) => {
-    const data = await apiLogin(username, password);
-    setTokenState(data.token);
-    setUser(data.user);
-    localStorage.setItem("ark_user", JSON.stringify(data.user));
+    const result = await signIn("credentials", {
+      username,
+      password,
+      redirect: false,
+    });
+
+    if (!result || result.error) {
+      throw new Error(result?.error || "Login failed. Please try again.");
+    }
   }, []);
 
   const logout = useCallback(() => {
-    apiLogout();
-    setTokenState(null);
-    setUser(null);
+    localStorage.removeItem("ark_token");
     localStorage.removeItem("ark_user");
+    signOut({ redirect: false });
   }, []);
 
   return (
@@ -61,10 +76,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         token,
-        isLoading,
+        isLoading: status === "loading",
         login,
         logout,
-        isAuthenticated: !!token && !!user,
+        isAuthenticated: status === "authenticated",
       }}
     >
       {children}
