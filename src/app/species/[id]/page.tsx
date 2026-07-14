@@ -14,23 +14,26 @@ export default function SpeciesDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    loadSpecies();
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const data = await getSpeciesById(id);
+        if (!cancelled) setSpecies(data);
+      } catch (err) {
+        if (!cancelled)
+          setError(
+            err instanceof Error ? err.message : "Failed to load species details."
+          );
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
-
-  async function loadSpecies() {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await getSpeciesById(id);
-      setSpecies(data);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load species details."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
 
   if (loading) {
     return (
