@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SessionProvider } from "next-auth/react";
 import { AuthProvider } from "@/app/context/AuthContext";
 import NavBar from "./NavBar";
 
@@ -16,10 +17,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-cream text-forest">
-        <AuthProvider>
-          <NavBar />
-          <main className="max-w-6xl mx-auto px-4 py-6">{children}</main>
-        </AuthProvider>
+        <SessionProvider>
+          <AuthProvider>
+            <NavBar />
+            <main className="max-w-6xl mx-auto px-4 py-6">{children}</main>
+          </AuthProvider>
+        </SessionProvider>
       </body>
     </html>
   );

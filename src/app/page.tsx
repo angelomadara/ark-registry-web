@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div className="space-y-12">
       {/* Hero */}
@@ -19,12 +24,14 @@ export default function Home() {
           >
             Browse Species
           </Link>
-          <Link
-            href="/login"
-            className="bg-forest text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-forest-light transition-colors"
-          >
-            Sign In
-          </Link>
+          {!isAuthenticated && (
+            <Link
+              href="/login"
+              className="bg-forest text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-forest-light transition-colors"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </section>
 
