@@ -10,9 +10,6 @@ export default function SpeciesListPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    loadSpecies();
-  }, []);
 
   async function loadSpecies() {
     setLoading(true);
@@ -39,6 +36,13 @@ export default function SpeciesListPage() {
             s.scientific_name.toLowerCase().includes(search.toLowerCase()))
       )
     : species;
+
+
+  useEffect(() => {
+    (async () => {
+      await loadSpecies();
+    })()
+  }, []);
 
   return (
     <div className="space-y-6">
